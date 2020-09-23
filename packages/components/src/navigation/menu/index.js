@@ -26,16 +26,18 @@ export default function NavigationMenu( props ) {
 		className,
 		hasSearch,
 		menu = ROOT_MENU,
+		onSearch,
 		parentMenu,
+		search,
 		title,
 	} = props;
-	const [ search, setSearch ] = useState( '' );
+	const [ uncontrolledSearch, setUncontrolledSearch ] = useState( '' );
 	useNavigationTreeMenu( props );
 	const { activeMenu } = useNavigationContext();
 
 	const context = {
 		menu,
-		search,
+		search: uncontrolledSearch,
 	};
 
 	// Keep the children rendered to make sure invisible items are included in the navigation tree
@@ -60,10 +62,12 @@ export default function NavigationMenu( props ) {
 				) }
 
 				<NavigationMenuTitle
+					controlledSearch={ search }
 					hasSearch={ hasSearch }
-					search={ search }
-					setSearch={ setSearch }
+					onControlledSearch={ onSearch }
+					setUncontrolledSearch={ setUncontrolledSearch }
 					title={ title }
+					uncontrolledSearch={ uncontrolledSearch }
 				/>
 
 				<ul>{ children }</ul>
