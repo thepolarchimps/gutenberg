@@ -26,9 +26,9 @@ export default function NavigationMenu( props ) {
 		className,
 		hasSearch,
 		menu = ROOT_MENU,
-		onSearch,
+		onSearch: setControlledSearch,
 		parentMenu,
-		search,
+		search: controlledSearch,
 		title,
 	} = props;
 	const [ uncontrolledSearch, setUncontrolledSearch ] = useState( '' );
@@ -49,6 +49,12 @@ export default function NavigationMenu( props ) {
 		);
 	}
 
+	const isControlledSearch = !! setControlledSearch;
+	const search = isControlledSearch ? controlledSearch : uncontrolledSearch;
+	const onSearch = isControlledSearch
+		? setControlledSearch
+		: setUncontrolledSearch;
+
 	const classes = classnames( 'components-navigation__menu', className );
 
 	return (
@@ -62,12 +68,10 @@ export default function NavigationMenu( props ) {
 				) }
 
 				<NavigationMenuTitle
-					controlledSearch={ search }
 					hasSearch={ hasSearch }
-					onControlledSearch={ onSearch }
-					setUncontrolledSearch={ setUncontrolledSearch }
+					onSearch={ onSearch }
+					search={ search }
 					title={ title }
-					uncontrolledSearch={ uncontrolledSearch }
 				/>
 
 				<ul>{ children }</ul>
