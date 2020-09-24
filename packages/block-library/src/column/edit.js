@@ -12,6 +12,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useInnerBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -56,6 +57,15 @@ function ColumnEdit( {
 		className: classes,
 		style: hasWidth ? { flexBasis: width + '%' } : undefined,
 	} );
+	const innerBlockWrapperProps = useInnerBlockWrapperProps(
+		blockWrapperProps,
+		{
+			templateLock: false,
+			renderAppender: hasChildBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+		}
+	);
 
 	return (
 		<>
@@ -84,14 +94,7 @@ function ColumnEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InnerBlocks
-				templateLock={ false }
-				renderAppender={
-					hasChildBlocks ? undefined : InnerBlocks.ButtonBlockAppender
-				}
-				__experimentalTagName="div"
-				__experimentalPassedProps={ blockWrapperProps }
-			/>
+			<div { ...innerBlockWrapperProps } />
 		</>
 	);
 }
