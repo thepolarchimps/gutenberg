@@ -558,6 +558,10 @@ _Related_
 
 Undocumented declaration.
 
+<a name="useInnerBlockWrapperProps" href="#useInnerBlockWrapperProps">#</a> **useInnerBlockWrapperProps**
+
+Undocumented declaration.
+
 <a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
 
 Given an array of theme colors checks colors for validity

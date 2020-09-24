@@ -23,7 +23,7 @@ import getBlockContext from './get-block-context';
 /**
  * Internal dependencies
  */
-import BlockList from '../block-list';
+import BlockList, { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
@@ -151,6 +151,109 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
 	}
 	return <UncontrolledInnerBlocks { ...allProps } />;
 } );
+
+function Uncontrolled( {
+	clientId,
+	allowedBlocks,
+	template,
+	templateLock,
+	forwardedRef,
+	templateInsertUpdatesSelection,
+	__experimentalCaptureToolbars: captureToolbars,
+	__experimentalAppenderTagName,
+	renderAppender,
+	orientation,
+} ) {
+	useNestedSettingsUpdate(
+		clientId,
+		allowedBlocks,
+		templateLock,
+		captureToolbars,
+		orientation
+	);
+
+	useInnerBlockTemplateSync(
+		clientId,
+		template,
+		templateLock,
+		templateInsertUpdatesSelection
+	);
+
+	const blockListItems = (
+		<BlockListItems
+			rootClientId={ clientId }
+			renderAppender={ renderAppender }
+			__experimentalAppenderTagName={ __experimentalAppenderTagName }
+			wrapperRef={ forwardedRef }
+		/>
+	);
+
+	const block = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		[ clientId ]
+	);
+
+	if ( ! block ) {
+		return blockListItems;
+	}
+
+	// Wrap context provider if (and only if) block has context to provide.
+	const blockType = getBlockType( block.name );
+
+	if ( ! blockType || ! blockType.providesContext ) {
+		return blockListItems;
+	}
+
+	const context = getBlockContext( block.attributes, blockType );
+
+	return (
+		<BlockContextProvider value={ context }>
+			{ blockListItems }
+		</BlockContextProvider>
+	);
+}
+
+function InnerBlocks( props ) {
+	const { clientId } = useBlockEditContext();
+	const Component =
+		props.value && props.onChange ? ControlledInnerBlocks : Uncontrolled;
+
+	return <Component { ...props } clientId={ clientId } />;
+}
+
+export function useInnerBlockWrapperProps( props, options ) {
+	const { clientId } = useBlockEditContext();
+	const isSmallScreen = useViewportMatch( 'medium', '<' );
+	const hasOverlay = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				isNavigationMode,
+			} = select( 'core/block-editor' );
+			return (
+				getBlockName( clientId ) !== 'core/template' &&
+				! isBlockSelected( clientId ) &&
+				! hasSelectedInnerBlock( clientId, true ) &&
+				( isNavigationMode() || isSmallScreen )
+			);
+		},
+		[ clientId, isSmallScreen ]
+	);
+
+	return {
+		...props,
+		className: classnames(
+			props.className,
+			'block-editor-block-list__layout',
+			{
+				'has-overlay': hasOverlay,
+			}
+		),
+		children: <InnerBlocks { ...options } />,
+	};
+}
 
 // Expose default appender placeholders as components.
 ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;

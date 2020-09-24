@@ -24,16 +24,36 @@ import useBlockDropZone from '../use-block-drop-zone';
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
 function BlockList(
-	{
-		className,
-		rootClientId,
-		renderAppender,
-		__experimentalTagName = 'div',
-		__experimentalAppenderTagName,
-		__experimentalPassedProps = {},
-	},
+	{ className, rootClientId, renderAppender, __experimentalPassedProps = {} },
 	ref
 ) {
+	const Container = rootClientId ? 'div' : RootContainer;
+
+	return (
+		<Container
+			ref={ ref }
+			{ ...__experimentalPassedProps }
+			className={ classnames(
+				'block-editor-block-list__layout',
+				className,
+				__experimentalPassedProps.className
+			) }
+		>
+			<BlockListItems
+				rootClientId={ rootClientId }
+				renderAppender={ renderAppender }
+				wrapperRef={ ref }
+			/>
+		</Container>
+	);
+}
+
+export function BlockListItems( {
+	rootClientId,
+	renderAppender,
+	__experimentalAppenderTagName,
+	wrapperRef,
+} ) {
 	function selector( select ) {
 		const {
 			getBlockOrder,
@@ -69,9 +89,8 @@ function BlockList(
 		isDraggingBlocks,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const Container = rootClientId ? __experimentalTagName : RootContainer;
 	const dropTargetIndex = useBlockDropZone( {
-		element: ref,
+		element: wrapperRef,
 		rootClientId,
 	} );
 
@@ -79,15 +98,7 @@ function BlockList(
 		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
 
 	return (
-		<Container
-			ref={ ref }
-			{ ...__experimentalPassedProps }
-			className={ classnames(
-				'block-editor-block-list__layout',
-				className,
-				__experimentalPassedProps.className
-			) }
-		>
+		<>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
@@ -129,7 +140,7 @@ function BlockList(
 						isAppenderDropTarget && orientation === 'horizontal',
 				} ) }
 			/>
-		</Container>
+		</>
 	);
 }
 
