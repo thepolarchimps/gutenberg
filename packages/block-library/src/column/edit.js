@@ -57,7 +57,7 @@ function ColumnEdit( {
 		className: classes,
 		style: hasWidth ? { flexBasis: width + '%' } : undefined,
 	} );
-	const innerBlockWrapperProps = useInnerBlocksProps( blockWrapperProps, {
+	const innerBlockProps = useInnerBlocksProps( blockWrapperProps, {
 		templateLock: false,
 		renderAppender: hasChildBlocks
 			? undefined
@@ -91,7 +91,7 @@ function ColumnEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...innerBlockWrapperProps } />
+			<div { ...innerBlockProps } />
 		</>
 	);
 }

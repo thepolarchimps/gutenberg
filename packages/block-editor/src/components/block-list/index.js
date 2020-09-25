@@ -23,20 +23,15 @@ import useBlockDropZone from '../use-block-drop-zone';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList(
-	{ className, rootClientId, renderAppender, __experimentalPassedProps = {} },
-	ref
-) {
+function BlockList( { className, rootClientId, renderAppender }, ref ) {
 	const Container = rootClientId ? 'div' : RootContainer;
 
 	return (
 		<Container
 			ref={ ref }
-			{ ...__experimentalPassedProps }
 			className={ classnames(
 				'block-editor-block-list__layout',
-				className,
-				__experimentalPassedProps.className
+				className
 			) }
 		>
 			<BlockListItems

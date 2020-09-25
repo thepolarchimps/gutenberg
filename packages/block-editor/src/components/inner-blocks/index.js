@@ -23,7 +23,7 @@ import getBlockContext from './get-block-context';
 /**
  * Internal dependencies
  */
-import BlockList, { BlockListItems } from '../block-list';
+import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
@@ -42,128 +42,14 @@ function UncontrolledInnerBlocks( props ) {
 		allowedBlocks,
 		template,
 		templateLock,
-		forwardedRef,
+		wrapperRef,
 		templateInsertUpdatesSelection,
 		__experimentalCaptureToolbars: captureToolbars,
+		__experimentalAppenderTagName,
+		renderAppender,
 		orientation,
 	} = props;
 
-	const isSmallScreen = useViewportMatch( 'medium', '<' );
-
-	const { hasOverlay, block, enableClickThrough } = useSelect( ( select ) => {
-		const {
-			getBlock,
-			isBlockSelected,
-			hasSelectedInnerBlock,
-			isNavigationMode,
-		} = select( 'core/block-editor' );
-		const theBlock = getBlock( clientId );
-		return {
-			block: theBlock,
-			hasOverlay:
-				theBlock.name !== 'core/template' &&
-				! isBlockSelected( clientId ) &&
-				! hasSelectedInnerBlock( clientId, true ),
-			enableClickThrough: isNavigationMode() || isSmallScreen,
-		};
-	} );
-
-	useNestedSettingsUpdate(
-		clientId,
-		allowedBlocks,
-		templateLock,
-		captureToolbars,
-		orientation
-	);
-
-	useInnerBlockTemplateSync(
-		clientId,
-		template,
-		templateLock,
-		templateInsertUpdatesSelection
-	);
-
-	const classes = classnames( {
-		'has-overlay': enableClickThrough && hasOverlay,
-		'is-capturing-toolbar': captureToolbars,
-	} );
-
-	let blockList = (
-		<BlockList
-			{ ...props }
-			ref={ forwardedRef }
-			rootClientId={ clientId }
-			className={ classes }
-		/>
-	);
-
-	// Wrap context provider if (and only if) block has context to provide.
-	const blockType = getBlockType( block.name );
-	if ( blockType && blockType.providesContext ) {
-		const context = getBlockContext( block.attributes, blockType );
-
-		blockList = (
-			<BlockContextProvider value={ context }>
-				{ blockList }
-			</BlockContextProvider>
-		);
-	}
-
-	if ( props.__experimentalTagName ) {
-		return blockList;
-	}
-
-	return <div className="block-editor-inner-blocks">{ blockList }</div>;
-}
-
-/**
- * The controlled inner blocks component wraps the uncontrolled inner blocks
- * component with the blockSync hook. This keeps the innerBlocks of the block in
- * the block-editor store in sync with the blocks of the controlling entity. An
- * example of an inner block controller is a template part block, which provides
- * its own blocks from the template part entity data source.
- *
- * @param {Object} props The component props.
- */
-function ControlledInnerBlocks( props ) {
-	useBlockSync( props );
-	return <UncontrolledInnerBlocks { ...props } />;
-}
-
-/**
- * Wrapped InnerBlocks component which detects whether to use the controlled or
- * uncontrolled variations of the InnerBlocks component. This is the component
- * which should be used throughout the application.
- */
-const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
-	const { clientId } = useBlockEditContext();
-	const fallbackRef = useRef();
-
-	const allProps = {
-		clientId,
-		forwardedRef: ref || fallbackRef,
-		...props,
-	};
-
-	// Detects if the InnerBlocks should be controlled by an incoming value.
-	if ( props.value && props.onChange ) {
-		return <ControlledInnerBlocks { ...allProps } />;
-	}
-	return <UncontrolledInnerBlocks { ...allProps } />;
-} );
-
-function Uncontrolled( {
-	clientId,
-	allowedBlocks,
-	template,
-	templateLock,
-	wrapperRef,
-	templateInsertUpdatesSelection,
-	__experimentalCaptureToolbars: captureToolbars,
-	__experimentalAppenderTagName,
-	renderAppender,
-	orientation,
-} ) {
 	useNestedSettingsUpdate(
 		clientId,
 		allowedBlocks,
@@ -213,15 +99,40 @@ function Uncontrolled( {
 	);
 }
 
+/**
+ * The controlled inner blocks component wraps the uncontrolled inner blocks
+ * component with the blockSync hook. This keeps the innerBlocks of the block in
+ * the block-editor store in sync with the blocks of the controlling entity. An
+ * example of an inner block controller is a template part block, which provides
+ * its own blocks from the template part entity data source.
+ *
+ * @param {Object} props The component props.
+ */
+function ControlledInnerBlocks( props ) {
+	useBlockSync( props );
+	return <UncontrolledInnerBlocks { ...props } />;
+}
+
+const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
+	const innerBlocksProps = useInnerBlocksProps( { ref }, props );
+	return (
+		<div className="block-editor-inner-blocks">
+			<div { ...innerBlocksProps } />
+		</div>
+	);
+} );
+
 function InnerBlocks( props ) {
 	const { clientId } = useBlockEditContext();
 	const Component =
-		props.value && props.onChange ? ControlledInnerBlocks : Uncontrolled;
+		props.value && props.onChange
+			? ControlledInnerBlocks
+			: UncontrolledInnerBlocks;
 
 	return <Component { ...props } clientId={ clientId } />;
 }
 
-export function useInnerBlocksProps( props, options ) {
+export function useInnerBlocksProps( props = {}, options = {} ) {
 	const fallbackRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );

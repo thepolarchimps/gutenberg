@@ -21,7 +21,7 @@ function GroupEdit( { attributes, clientId } ) {
 	);
 	const blockWrapperProps = useBlockWrapperProps();
 	const { tagName: TagName = 'div' } = attributes;
-	const innerBlockWrapperProps = useInnerBlocksProps(
+	const innerBlockProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-group__inner-container',
 		},
@@ -38,7 +38,7 @@ function GroupEdit( { attributes, clientId } ) {
 				values={ attributes.style?.spacing?.padding }
 				showValues={ attributes.style?.visualizers?.padding }
 			/>
-			<div { ...innerBlockWrapperProps } />
+			<div { ...innerBlockProps } />
 		</TagName>
 	);
 }
