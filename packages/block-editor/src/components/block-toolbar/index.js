@@ -10,7 +10,6 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
-import BlockParentSelector from '../block-parent-selector';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
@@ -26,14 +25,12 @@ export default function BlockToolbar( {
 		blockClientIds,
 		blockClientId,
 		blockType,
-		hasParent,
 		isValid,
 		isVisual,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
 			getBlockMode,
-			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
@@ -49,7 +46,6 @@ export default function BlockToolbar( {
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 			rootClientId: blockRootClientId,
-			hasParent: getBlockParents( selectedBlockClientId ).length > 0,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
 			),
@@ -88,11 +84,6 @@ export default function BlockToolbar( {
 
 	return (
 		<Wrapper className="block-editor-block-toolbar">
-			{ hasParent && ! isMultiToolbar && (
-				<ToolbarGroup className="block-editor-block-toolbar__block-parent-selector-wrapper">
-					<BlockParentSelector clientIds={ blockClientIds } />
-				</ToolbarGroup>
-			) }
 			<div ref={ nodeRef } { ...showBlockHighlightGestures }>
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
