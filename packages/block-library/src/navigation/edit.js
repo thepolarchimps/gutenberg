@@ -10,7 +10,7 @@ import classnames from 'classnames';
 import { useState } from '@wordpress/element';
 import {
 	InnerBlocks,
-	useInnerBlockWrapperProps,
+	useInnerBlocksProps,
 	InspectorControls,
 	BlockControls,
 	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
@@ -52,7 +52,7 @@ function Navigation( {
 		clientId
 	);
 
-	const innerBlockWrapperProps = useInnerBlockWrapperProps(
+	const innerBlockWrapperProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
 		},

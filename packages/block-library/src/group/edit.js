@@ -4,7 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
-	useInnerBlockWrapperProps,
+	useInnerBlocksProps,
 	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
@@ -21,7 +21,7 @@ function GroupEdit( { attributes, clientId } ) {
 	);
 	const blockWrapperProps = useBlockWrapperProps();
 	const { tagName: TagName = 'div' } = attributes;
-	const innerBlockWrapperProps = useInnerBlockWrapperProps(
+	const innerBlockWrapperProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-group__inner-container',
 		},

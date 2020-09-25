@@ -221,7 +221,7 @@ function InnerBlocks( props ) {
 	return <Component { ...props } clientId={ clientId } />;
 }
 
-export function useInnerBlockWrapperProps( props, options ) {
+export function useInnerBlocksProps( props, options ) {
 	const { clientId } = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const hasOverlay = useSelect(

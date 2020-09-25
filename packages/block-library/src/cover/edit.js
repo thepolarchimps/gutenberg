@@ -31,7 +31,7 @@ import {
 	withColors,
 	ColorPalette,
 	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
-	useInnerBlockWrapperProps,
+	useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -427,7 +427,7 @@ function CoverEdit( {
 	);
 
 	const blockWrapperProps = useBlockWrapperProps();
-	const innerBlockWrapperProps = useInnerBlockWrapperProps(
+	const innerBlockWrapperProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container test',
 		},

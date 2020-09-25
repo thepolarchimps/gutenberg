@@ -558,7 +558,7 @@ _Related_
 
 Undocumented declaration.
 
-<a name="useInnerBlockWrapperProps" href="#useInnerBlockWrapperProps">#</a> **useInnerBlockWrapperProps**
+<a name="useInnerBlocksProps" href="#useInnerBlocksProps">#</a> **useInnerBlocksProps**
 
 Undocumented declaration.
 
