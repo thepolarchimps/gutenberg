@@ -157,7 +157,7 @@ function Uncontrolled( {
 	allowedBlocks,
 	template,
 	templateLock,
-	forwardedRef,
+	wrapperRef,
 	templateInsertUpdatesSelection,
 	__experimentalCaptureToolbars: captureToolbars,
 	__experimentalAppenderTagName,
@@ -184,7 +184,7 @@ function Uncontrolled( {
 			rootClientId={ clientId }
 			renderAppender={ renderAppender }
 			__experimentalAppenderTagName={ __experimentalAppenderTagName }
-			wrapperRef={ forwardedRef }
+			wrapperRef={ wrapperRef }
 		/>
 	);
 
@@ -222,6 +222,7 @@ function InnerBlocks( props ) {
 }
 
 export function useInnerBlocksProps( props, options ) {
+	const fallbackRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const hasOverlay = useSelect(
@@ -242,8 +243,11 @@ export function useInnerBlocksProps( props, options ) {
 		[ clientId, isSmallScreen ]
 	);
 
+	const ref = props.ref || fallbackRef;
+
 	return {
 		...props,
+		ref,
 		className: classnames(
 			props.className,
 			'block-editor-block-list__layout',
@@ -251,7 +255,7 @@ export function useInnerBlocksProps( props, options ) {
 				'has-overlay': hasOverlay,
 			}
 		),
-		children: <InnerBlocks { ...options } />,
+		children: <InnerBlocks { ...options } wrapperRef={ ref } />,
 	};
 }
 
