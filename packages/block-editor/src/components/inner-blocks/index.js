@@ -122,16 +122,6 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
 	);
 } );
 
-function InnerBlocks( props ) {
-	const { clientId } = useBlockEditContext();
-	const Component =
-		props.value && props.onChange
-			? ControlledInnerBlocks
-			: UncontrolledInnerBlocks;
-
-	return <Component { ...props } clientId={ clientId } />;
-}
-
 export function useInnerBlocksProps( props = {}, options = {} ) {
 	const fallbackRef = useRef();
 	const { clientId } = useBlockEditContext();
@@ -155,6 +145,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	);
 
 	const ref = props.ref || fallbackRef;
+	const InnerBlocks =
+		options.value && options.onChange
+			? ControlledInnerBlocks
+			: UncontrolledInnerBlocks;
 
 	return {
 		...props,
@@ -166,7 +160,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				'has-overlay': hasOverlay,
 			}
 		),
-		children: <InnerBlocks { ...options } wrapperRef={ ref } />,
+		children: (
+			<InnerBlocks
+				{ ...options }
+				clientId={ clientId }
+				wrapperRef={ ref }
+			/>
+		),
 	};
 }
 
