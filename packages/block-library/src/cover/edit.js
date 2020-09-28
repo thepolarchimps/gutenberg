@@ -427,7 +427,7 @@ function CoverEdit( {
 	);
 
 	const blockWrapperProps = useBlockWrapperProps();
-	const innerBlockProps = useInnerBlocksProps(
+	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container test',
 		},
@@ -555,7 +555,7 @@ function CoverEdit( {
 						style={ { objectPosition: positionValue } }
 					/>
 				) }
-				<div { ...innerBlockProps } />
+				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);

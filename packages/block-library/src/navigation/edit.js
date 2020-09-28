@@ -52,7 +52,7 @@ function Navigation( {
 		clientId
 	);
 
-	const innerBlockProps = useInnerBlocksProps(
+	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
 		},
@@ -178,7 +178,7 @@ function Navigation( {
 					blockClassNames
 				) }
 			>
-				<ul { ...innerBlockProps } />
+				<ul { ...innerBlocksProps } />
 			</nav>
 		</>
 	);

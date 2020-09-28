@@ -33,7 +33,7 @@ export function SocialLinksEdit( props ) {
 		setAttributes,
 	} = props;
 	const blockWrapperProps = useBlockWrapperProps();
-	const innerBlockProps = useInnerBlocksProps( blockWrapperProps, {
+	const innerBlocksProps = useInnerBlocksProps( blockWrapperProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		templateLock: false,
 		template: TEMPLATE,
@@ -53,7 +53,7 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<ul { ...innerBlockProps } />
+			<ul { ...innerBlocksProps } />
 		</Fragment>
 	);
 }

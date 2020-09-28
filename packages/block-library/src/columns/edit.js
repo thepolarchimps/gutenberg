@@ -66,7 +66,7 @@ function ColumnsEditContainer( {
 	const blockWrapperProps = useBlockWrapperProps( {
 		className: classes,
 	} );
-	const innerBlockProps = useInnerBlocksProps( blockWrapperProps, {
+	const innerBlocksProps = useInnerBlocksProps( blockWrapperProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
 		renderAppender: false,
@@ -98,7 +98,7 @@ function ColumnsEditContainer( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<div { ...innerBlockProps } />
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }
