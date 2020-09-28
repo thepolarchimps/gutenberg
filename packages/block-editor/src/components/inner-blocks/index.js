@@ -74,23 +74,24 @@ function UncontrolledInnerBlocks( props ) {
 		/>
 	);
 
-	const block = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+	const context = useSelect(
+		( select ) => {
+			const block = select( 'core/block-editor' ).getBlock( clientId );
+
+			if ( ! block ) {
+				return;
+			}
+
+			const blockType = getBlockType( block.name );
+
+			if ( ! blockType || ! blockType.providesContext ) {
+				return;
+			}
+
+			return getBlockContext( block.attributes, blockType );
+		},
 		[ clientId ]
 	);
-
-	if ( ! block ) {
-		return blockListItems;
-	}
-
-	// Wrap context provider if (and only if) block has context to provide.
-	const blockType = getBlockType( block.name );
-
-	if ( ! blockType || ! blockType.providesContext ) {
-		return blockListItems;
-	}
-
-	const context = getBlockContext( block.attributes, blockType );
 
 	return (
 		<BlockContextProvider value={ context }>

@@ -123,8 +123,6 @@ describe( 'Writing Flow', () => {
 		expect( activeBlockName ).toBe( 'core/column' );
 		// Arrow down to reach second Column block
 		await page.keyboard.press( 'ArrowDown' );
-		activeBlockName = await getActiveBlockName();
-		expect( activeBlockName ).toBe( 'core/column' );
 		// Arrow right again into Paragraph block
 		await page.keyboard.press( 'ArrowRight' );
 		activeBlockName = await getActiveBlockName();
