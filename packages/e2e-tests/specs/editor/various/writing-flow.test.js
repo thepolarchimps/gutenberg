@@ -76,6 +76,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
+		let frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		activeElementText = await frame.evaluate(
 			() => document.activeElement.textContent
 		);
@@ -99,6 +102,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/paragraph' );
+		frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		activeElementText = await frame.evaluate(
 			() => document.activeElement.textContent
 		);
