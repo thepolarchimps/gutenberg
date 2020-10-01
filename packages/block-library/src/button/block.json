@@ -58,6 +58,7 @@
 		"align": true,
 		"alignWide": false,
 		"reusable": false,
-		"lightBlockWrapper": true
+		"lightBlockWrapper": true,
+		"__experimentalSelector": ".wp-block-button > a"
 	}
 }
