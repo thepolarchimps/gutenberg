@@ -55,7 +55,7 @@ function InsertionPointInserter( {
 			return;
 		}
 
-		const { ownerDocument } = ref.current;
+		const { ownerDocument } = containerRef.current;
 		const targetRect = target.getBoundingClientRect();
 		const isReverse = clientY < targetRect.top + targetRect.height / 2;
 		const blockNode = getBlockDOMNode( clientId, ownerDocument );
