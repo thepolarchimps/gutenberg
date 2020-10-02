@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import { mapValues } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -19,6 +24,7 @@ import {
  */
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
+import { useGlobalStylesContext } from '../editor/global-styles-provider';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page } = useSelect(
@@ -34,15 +40,28 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		},
 		[ setIsInserterOpen ]
 	);
+
+	const { mergedStyles } = useGlobalStylesContext();
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		templateType
 	);
 
+	const blockEditorSettings = useMemo(
+		() => ( {
+			...settings,
+			__experimentalFeatures: mapValues(
+				mergedStyles,
+				( value ) => value.settings || {}
+			),
+		} ),
+		[ settings, mergedStyles ]
+	);
+
 	const { setPage } = useDispatch( 'core/edit-site' );
 	return (
 		<BlockEditorProvider
-			settings={ settings }
+			settings={ blockEditorSettings }
 			value={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }

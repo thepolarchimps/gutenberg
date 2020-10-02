@@ -19,12 +19,16 @@ import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/bloc
 /**
  * Internal dependencies
  */
-import getGlobalStyles from './global-styles-renderer';
+import {
+	default as getGlobalStyles,
+	mergeTrees,
+} from './global-styles-renderer';
 
 const EMPTY_CONTENT = '{}';
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
+	mergedStyles: {},
 	getSetting: ( context, path ) => {},
 	setSetting: ( context, path, newValue ) => {},
 	getStyleProperty: ( context, propertyName ) => {},
@@ -48,17 +52,25 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-export default ( { children, baseStyles, contexts } ) => {
+export default function GlobalStylesProvider( {
+	children,
+	baseStyles,
+	contexts,
+} ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 
-	const userStyles = useMemo(
-		() => ( content ? JSON.parse( content ) : {} ),
-		[ content ]
-	);
+	const { userStyles, mergedStyles } = useMemo( () => {
+		const parsedContent = content ? JSON.parse( content ) : {};
+		return {
+			userStyles: parsedContent,
+			mergedStyles: mergeTrees( baseStyles, parsedContent ),
+		};
+	}, [ content ] );
 
 	const nextValue = useMemo(
 		() => ( {
 			contexts,
+			mergedStyles,
 			getSetting: ( context, path ) =>
 				get( userStyles?.[ context ]?.settings, path ),
 			setSetting: ( context, path, newValue ) => {
@@ -110,11 +122,7 @@ export default ( { children, baseStyles, contexts } ) => {
 				.appendChild( styleNode );
 		}
 
-		styleNode.innerText = getGlobalStyles(
-			contexts,
-			baseStyles,
-			userStyles
-		);
+		styleNode.innerText = getGlobalStyles( contexts, mergedStyles );
 	}, [ contexts, baseStyles, content ] );
 
 	return (
@@ -122,4 +130,4 @@ export default ( { children, baseStyles, contexts } ) => {
 			{ children }
 		</GlobalStylesContext.Provider>
 	);
-};
+}
