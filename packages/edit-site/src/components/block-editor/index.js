@@ -17,8 +17,8 @@ import {
 	WritingFlow,
 	ObserveTyping,
 	BlockList,
-	BlockSelectionClearer,
 	__experimentalUseResizeCanvas as useResizeCanvas,
+	useBlockSelectionClearer,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -28,54 +28,63 @@ import { __ } from '@wordpress/i18n';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
-export const IFrame = ( {
-	children,
-	head,
-	styles,
-	bodyClassName,
-	...props
-} ) => {
-	const [ contentRef, setContentRef ] = useState();
-	const doc = contentRef && contentRef.contentWindow.document;
+function IframeContent( { children, doc, head, styles, bodyClassName } ) {
+	const onFocus = useBlockSelectionClearer();
 
 	useEffect( () => {
-		if ( doc ) {
-			doc.body.className = bodyClassName;
-			doc.body.style.margin = '0';
-			doc.head.innerHTML = head;
-			doc.dir = document.dir;
+		doc.body.className = bodyClassName;
+		doc.body.style.margin = '0';
+		doc.head.innerHTML = head;
+		doc.dir = document.dir;
+		doc.body.tabIndex = '-1';
 
-			styles.forEach( ( { css } ) => {
-				const styleEl = doc.createElement( 'style' );
-				styleEl.innerHTML = css;
-				doc.head.appendChild( styleEl );
-			} );
+		doc.body.addEventListener( 'focus', onFocus );
 
-			// Search the document for stylesheets targetting the editor canvas.
-			Array.from( document.styleSheets ).reduce( ( acc, styleSheet ) => {
-				// May fail for external styles.
-				try {
-					const isMatch = [ ...styleSheet.cssRules ].find(
-						( { selectorText } ) => {
-							return selectorText.includes(
-								'.editor-styles-wrapper'
-							);
-						}
-					);
+		styles.forEach( ( { css } ) => {
+			const styleEl = doc.createElement( 'style' );
+			styleEl.innerHTML = css;
+			doc.head.appendChild( styleEl );
+		} );
 
-					if ( isMatch ) {
-						const node = styleSheet.ownerNode;
-
-						if ( ! doc.getElementById( node.id ) ) {
-							doc.head.appendChild( node );
-						}
+		// Search the document for stylesheets targetting the editor canvas.
+		Array.from( document.styleSheets ).reduce( ( acc, styleSheet ) => {
+			// May fail for external styles.
+			try {
+				const isMatch = [ ...styleSheet.cssRules ].find(
+					( { selectorText } ) => {
+						return selectorText.includes(
+							'.editor-styles-wrapper'
+						);
 					}
-				} catch ( e ) {}
+				);
 
-				return acc;
-			}, [] );
-		}
-	}, [ doc ] );
+				if ( isMatch ) {
+					const node = styleSheet.ownerNode;
+
+					if ( ! doc.getElementById( node.id ) ) {
+						doc.head.appendChild( node );
+					}
+				}
+			} catch ( e ) {}
+
+			return acc;
+		}, [] );
+	}, [] );
+
+	useEffect( () => {
+		doc.body.addEventListener( 'focus', onFocus );
+
+		return () => {
+			doc.body.removeEventListener( 'focus', onFocus );
+		};
+	}, [ onFocus ] );
+
+	return createPortal( children, doc.body );
+}
+
+export function IFrame( { children, head, styles, bodyClassName, ...props } ) {
+	const [ contentRef, setContentRef ] = useState();
+	const doc = contentRef && contentRef.contentWindow.document;
 
 	return (
 		<iframe
@@ -85,10 +94,19 @@ export const IFrame = ( {
 			name="editor-canvas"
 			data-loaded={ !! contentRef }
 		>
-			{ doc && createPortal( children, doc.body ) }
+			{ doc && (
+				<IframeContent
+					doc={ doc }
+					head={ head }
+					styles={ styles }
+					bodyClassName={ bodyClassName }
+				>
+					{ children }
+				</IframeContent>
+			) }
 		</iframe>
 	);
-};
+}
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
@@ -148,13 +166,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				styles={ settings.styles }
 				bodyClassName="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper"
 			>
-				<BlockSelectionClearer>
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList className="edit-site-block-editor__block-list" />
-						</ObserveTyping>
-					</WritingFlow>
-				</BlockSelectionClearer>
+				<WritingFlow>
+					<ObserveTyping>
+						<BlockList className="edit-site-block-editor__block-list" />
+					</ObserveTyping>
+				</WritingFlow>
 			</IFrame>
 		</BlockEditorProvider>
 	);
