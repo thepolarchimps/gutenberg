@@ -40,6 +40,12 @@ function IframeContent( { children, doc, head, styles, bodyClassName } ) {
 
 		doc.body.addEventListener( 'focus', onFocus );
 
+		Array.from( document.body.classList ).forEach( ( name ) => {
+			if ( name.startsWith( 'admin-color-' ) ) {
+				doc.body.classList.add( name );
+			}
+		} );
+
 		styles.forEach( ( { css } ) => {
 			const styleEl = doc.createElement( 'style' );
 			styleEl.innerHTML = css;
