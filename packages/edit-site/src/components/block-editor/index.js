@@ -32,13 +32,19 @@ function IframeContent( { children, doc, head, styles, bodyClassName } ) {
 	const onFocus = useBlockSelectionClearer();
 
 	useEffect( () => {
+		doc.body.tabIndex = '-1';
+		doc.body.addEventListener( 'focus', onFocus );
+
+		return () => {
+			doc.body.removeEventListener( 'focus', onFocus );
+		};
+	}, [ onFocus ] );
+
+	useEffect( () => {
 		doc.body.className = bodyClassName;
 		doc.body.style.margin = '0';
 		doc.head.innerHTML = head;
 		doc.dir = document.dir;
-		doc.body.tabIndex = '-1';
-
-		doc.body.addEventListener( 'focus', onFocus );
 
 		Array.from( document.body.classList ).forEach( ( name ) => {
 			if ( name.startsWith( 'admin-color-' ) ) {
@@ -53,37 +59,27 @@ function IframeContent( { children, doc, head, styles, bodyClassName } ) {
 		} );
 
 		// Search the document for stylesheets targetting the editor canvas.
-		Array.from( document.styleSheets ).reduce( ( acc, styleSheet ) => {
-			// May fail for external styles.
+		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
 			try {
-				const isMatch = [ ...styleSheet.cssRules ].find(
-					( { selectorText } ) => {
-						return selectorText.includes(
-							'.editor-styles-wrapper'
-						);
-					}
-				);
+				// May fail for external styles.
+				// eslint-disable-next-line no-unused-expressions
+				styleSheet.cssRules;
+			} catch ( e ) {
+				return;
+			}
 
-				if ( isMatch ) {
-					const node = styleSheet.ownerNode;
+			const { ownerNode, cssRules } = styleSheet;
+			const isMatch = Array.from( cssRules ).find(
+				( { selectorText } ) =>
+					selectorText &&
+					selectorText.includes( '.editor-styles-wrapper' )
+			);
 
-					if ( ! doc.getElementById( node.id ) ) {
-						doc.head.appendChild( node );
-					}
-				}
-			} catch ( e ) {}
-
-			return acc;
-		}, [] );
+			if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
+				doc.head.appendChild( ownerNode );
+			}
+		} );
 	}, [] );
-
-	useEffect( () => {
-		doc.body.addEventListener( 'focus', onFocus );
-
-		return () => {
-			doc.body.removeEventListener( 'focus', onFocus );
-		};
-	}, [ onFocus ] );
 
 	return createPortal( children, doc.body );
 }
