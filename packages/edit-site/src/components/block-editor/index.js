@@ -28,6 +28,11 @@ import { __ } from '@wordpress/i18n';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
+const alignmentFix = {
+	css:
+		'.wp-block[data-align="full"],.wp-block.alignfull{max-width:100vw!important;width:100vw!important;}',
+};
+
 function IframeContent( { children, doc, head, styles, bodyClassName } ) {
 	const onFocus = useBlockSelectionClearer();
 
@@ -52,7 +57,7 @@ function IframeContent( { children, doc, head, styles, bodyClassName } ) {
 			}
 		} );
 
-		styles.forEach( ( { css } ) => {
+		[ ...styles, alignmentFix ].forEach( ( { css } ) => {
 			const styleEl = doc.createElement( 'style' );
 			styleEl.innerHTML = css;
 			doc.head.appendChild( styleEl );
